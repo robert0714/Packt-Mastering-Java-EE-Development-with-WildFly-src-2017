@@ -26,7 +26,7 @@ import org.jboss.ejb3.annotation.DeliveryActive;
 		@ActivationConfigProperty(propertyName = "acknowledgeMode", propertyValue = "Auto-acknowledge"),
 		@ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Queue") })
 //Do not deliver messages to this MDB until start-delivery management operation is explicitly called on it.
-@DeliveryActive(false)
+@DeliveryActive(true)
 public class WorkingBean implements MessageListener {
 
 	private static final Logger logger = getLogger(WorkingBean.class.getName());
@@ -39,9 +39,7 @@ public class WorkingBean implements MessageListener {
 	@Override
 	public void onMessage(Message message) {
 		TextMessage msg = null;
-		try {
-			System.out.println("---------------------------------");
-			System.out.println(message.getClass().getCanonicalName());
+		try { 
 			
 			if (message instanceof TextMessage) {
 				msg = (TextMessage) message;

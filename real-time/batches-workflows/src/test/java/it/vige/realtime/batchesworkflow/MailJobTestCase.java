@@ -5,6 +5,21 @@ import static java.util.logging.Level.SEVERE;
 import static java.util.logging.Logger.getLogger;
 import static javax.batch.runtime.BatchRuntime.getJobOperator;
 import static javax.batch.runtime.BatchStatus.COMPLETED;
+import org.awaitility.Duration;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
+import org.awaitility.Awaitility;
+import static org.awaitility.Awaitility.await;
+import static org.awaitility.Awaitility.fieldIn;
+import static org.awaitility.Awaitility.given;
+import static org.awaitility.Awaitility.setDefaultPollDelay;
+import static org.awaitility.Awaitility.setDefaultPollInterval;
+import static org.awaitility.Awaitility.setDefaultTimeout;
+import static org.awaitility.proxy.AwaitilityClassProxy.to;
+import static org.hamcrest.Matchers.equalTo;
 import static org.jboss.shrinkwrap.api.ShrinkWrap.create;
 import static org.jboss.shrinkwrap.api.asset.EmptyAsset.INSTANCE;
 import static org.jboss.shrinkwrap.resolver.api.maven.Maven.resolver;
@@ -34,6 +49,7 @@ import javax.batch.runtime.Metric;
 import javax.batch.runtime.StepExecution;
 import javax.mail.Session;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.asset.FileAsset;
@@ -51,8 +67,6 @@ import org.subethamail.smtp.server.SMTPServer;
 
 import it.vige.realtime.batchesworkflow.mail.MailBatchlet;
 
-//FIXME
-@Ignore
 @RunWith(Arquillian.class)
 public class MailJobTestCase {
 
@@ -70,12 +84,19 @@ public class MailJobTestCase {
 		final WebArchive war = create(WebArchive.class, "mailjob-test.war");
 		File[] files = resolver().loadPomFromFile("pom.xml").importRuntimeDependencies()
 				.resolve("org.subethamail:subethasmtp:3.1.7").withTransitivity().asFile();
+		File[] files02 = resolver().loadPomFromFile("pom.xml").importRuntimeDependencies()
+				.resolve("org.awaitility:awaitility:3.1.6").withTransitivity().asFile();
+		
 		war.addPackage(MailBatchlet.class.getPackage());
-		war.addPackage(org.codehaus.plexus.util.xml.Xpp3DomBuilder.class.getPackage()); 
+		
+		war.addPackage(org.codehaus.plexus.util.xml.Xpp3DomBuilder.class.getPackage());  
+		
+		
 		war.addAsWebInfResource(INSTANCE, "beans.xml");
 		war.addAsWebInfResource(new FileAsset(new File("src/main/resources/META-INF/batch-jobs/" + JOB_NAME + ".xml")),
 				"classes/META-INF/batch-jobs/" + JOB_NAME + ".xml");
-		war.addAsLibraries(files);
+		
+		war.addAsLibraries(ArrayUtils.addAll(files, files02)); 
 		return war;
 	}
 
@@ -131,9 +152,25 @@ public class MailJobTestCase {
 				myFactory.getBody().contains("Job Execution id " + executionId + " warned disk space getting low!"));
 	}
 
-	private void stepExecutions(StepExecution stepExecution, boolean last) {
+	private void stepExecutions(StepExecution stepExecution, boolean last) {		
+		await()
+			.atLeast(Duration.ONE_HUNDRED_MILLISECONDS)
+			.atMost(Duration.ONE_MINUTE)
+		.with()
+			.pollInterval(Duration.ONE_HUNDRED_MILLISECONDS)
+			.until(stepExecution::getBatchStatus, equalTo(COMPLETED));
+		
 		assertEquals("the batch has completed", COMPLETED, stepExecution.getBatchStatus());
+		
+		await()
+			.atLeast(Duration.ONE_HUNDRED_MILLISECONDS)
+			.atMost(Duration.ONE_MINUTE)
+		.with()
+			.pollInterval(Duration.ONE_HUNDRED_MILLISECONDS)
+			.until(stepExecution::getExitStatus, equalTo(COMPLETED.name()));	
+		
 		assertEquals("the batch has completed", COMPLETED.name(), stepExecution.getExitStatus());
+		
 		Date startTime = stepExecution.getStartTime();
 		Date endTime = stepExecution.getEndTime();
 		assertNotNull("The step is started", startTime);

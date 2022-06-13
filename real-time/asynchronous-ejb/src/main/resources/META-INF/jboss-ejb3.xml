@@ -7,22 +7,22 @@
                      http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/ejb-jar_3_1.xsd"
                version="3.1"
                impl-version="2.0">
-    <enterprise-beans>
+    <enterprise-beans>        
         <message-driven>
             <ejb-name>OldSpecsBean</ejb-name>
-            <ejb-class>it.vige.realtime.asynchronousejb.timer.OldSpecsBean</ejb-class>
+            <ejb-class>it.vige.realtime.asynchronousejb.messagebean.OldSpecsWorkingBean</ejb-class>           
             <activation-config>
-                <activation-config-property>
+                <activation-config-property>                	
                     <activation-config-property-name>destination</activation-config-property-name>
-                    <activation-config-property-value>java:jboss/deliveryactive/MDBWithDeploymentDescriptorQueue</activation-config-property-value>
+                    <activation-config-property-value>java:/jms/queue/DLQ</activation-config-property-value>
                 </activation-config-property>
             </activation-config>
         </message-driven>
     </enterprise-beans>
     <assembly-descriptor>
         <d:delivery>
-            <ejb-name>OldSpecsBean</ejb-name>
-            <d:active>false</d:active>
+            <ejb-name>OldSpecsWorkingBean</ejb-name>
+            <d:active>true</d:active>
         </d:delivery>
     </assembly-descriptor>
 </jboss:ejb-jar>

@@ -12,7 +12,24 @@
 	<packaging>ejb</packaging>
 	<name>Batches and workflows</name>
 	<description>Chapter 12: Batches and workflows</description>
-
+	<dependencies>
+		<dependency>
+			<groupId>org.codehaus.plexus</groupId>
+			<artifactId>plexus-utils</artifactId>
+			<version>3.3.1</version>
+			<scope>test</scope>
+		</dependency> 
+		<dependency>
+			<groupId>org.awaitility</groupId>
+			<artifactId>awaitility</artifactId> 
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.awaitility</groupId>
+			<artifactId>awaitility-proxy</artifactId> 
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
 	<build>
 		<defaultGoal>package</defaultGoal>
 		<finalName>batches-workflows</finalName>

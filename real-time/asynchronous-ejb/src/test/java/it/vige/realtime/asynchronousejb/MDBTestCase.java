@@ -1,7 +1,7 @@
 package it.vige.realtime.asynchronousejb;
-
-import it.vige.realtime.asynchronousejb.messagebean.OldSpecsWorkingBean; 
+ 
 import static java.util.logging.Logger.getLogger;
+import static javax.batch.runtime.BatchStatus.COMPLETED;
 import static javax.jms.Session.AUTO_ACKNOWLEDGE;
 import static org.jboss.as.test.shared.integration.ejb.security.PermissionUtils.createPermissionsXmlAsset;
 import static org.jboss.shrinkwrap.api.ShrinkWrap.create;
@@ -9,6 +9,9 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.jboss.shrinkwrap.api.asset.EmptyAsset.INSTANCE;
+import static org.jboss.shrinkwrap.resolver.api.maven.Maven.resolver;
+import static org.awaitility.Awaitility.await;
+import static org.hamcrest.Matchers.equalTo;
 import static org.jboss.as.controller.client.helpers.ClientConstants.NAME;
 import static org.jboss.as.controller.client.helpers.ClientConstants.OP;
 import static org.jboss.as.controller.client.helpers.ClientConstants.OP_ADDR;
@@ -32,11 +35,14 @@ import javax.annotation.Resource;
 import javax.ejb.EJB;
 import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
+import javax.jms.JMSConsumer;
 import javax.jms.JMSContext;
 import javax.jms.Message;
 import javax.jms.Queue;
 
 import org.jboss.arquillian.test.api.ArquillianResource;
+import org.apache.commons.lang3.ArrayUtils;
+import org.awaitility.Duration;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.as.arquillian.container.ManagementClient;
@@ -54,6 +60,8 @@ import org.junit.runner.RunWith;
 import org.jboss.as.arquillian.api.ServerSetup;
 import org.jboss.as.arquillian.api.ServerSetupTask;
 import org.jboss.dmr.ModelNode;
+
+import it.vige.realtime.asynchronousejb.messagebean.OldSpecsWorkingBean;
 import it.vige.realtime.asynchronousejb.messagebean.WorkingBean;
 import it.vige.realtime.asynchronousejb.timer.OldSpecsBean;
 
@@ -93,11 +101,9 @@ import org.junit.runner.RunWith;
 import org.junit.Ignore;
 
  
-//FIXME
-@Ignore
+
 //refer: https://github.com/wildfly/wildfly/blob/main/testsuite/integration/basic/src/test/java/org/jboss/as/test/integration/ejb/mdb/deliveryactive/MDBTestCase.java
 @RunWith(Arquillian.class)
-//@ServerSetup({MDBTestCase.JmsQueueSetup.class})
 public class MDBTestCase {
 
 	private static final Logger logger = getLogger(MDBTestCase.class.getName());
@@ -106,26 +112,22 @@ public class MDBTestCase {
 	public static Archive<?> createEJBDeployment() {
 		final EnterpriseArchive ear = create(EnterpriseArchive.class, "mdb-ejb-test.ear");
 		final JavaArchive ejbJar = create(JavaArchive.class, "mdb-ejb-test.jar")  
-//				.addPackage(WorkingBean.class.getPackage())
-				.addClass(WorkingBean.class )
-				.addPackage(JMSOperations.class.getPackage())
-//				.addPackage(OldSpecsBean.class.getPackage())
+				.addPackage(WorkingBean.class.getPackage()) 
+				.addPackage(JMSOperations.class.getPackage()) 
 				.addClass(TimeoutUtil.class)
 				.addClass(MDBTestCase.class)
 				.addClass(ManagementClient.class)
 				.deleteClass(AsyncBeanTestCase.class)
 				.deleteClass(BusyOperatorTestCase.class)
 				.deleteClass(SchedulerTestCase.class)
-				.deleteClass(TimerTestCase.class)
-				// .addAsManifestResource(WorkingBean.class.getPackage(), "jboss-ejb3.xml", "jboss-ejb3.xml")
-				// .addAsManifestResource(MDBTestCase.class.getPackage(), "jboss-ejb3.xml", "jboss-ejb3.xml")
-                // .addAsManifestResource(new FileAsset(new File("src/main/resources/META-INF/jboss-ejb3.xml")), "jboss-ejb3.xml")
-//				.addAsResource (new FileAsset(new File("src/main/resources/META-INF/jboss-ejb3.xml")), "META-INF/jboss-ejb3.xml") 
+				.deleteClass(TimerTestCase.class)				  
 				.addAsManifestResource(
 						new StringAsset(
 								"Dependencies: org.jboss.as.controller-client, org.jboss.dmr, org.jboss.remoting\n"),
 						"MANIFEST.MF");
 		
+				ejbJar.addPackage(org.codehaus.plexus.util.xml.Xpp3DomBuilder.class.getPackage());  
+				
 		// grant necessary permissions
         ejbJar.addAsManifestResource(createPermissionsXmlAsset(
                 new PropertyPermission("ts.timeout.factor", "read"),
@@ -133,40 +135,22 @@ public class MDBTestCase {
                 new RemotingPermission("connect"),
                 new FilePermission(System.getProperty("jboss.inst") + "/standalone/tmp/auth/*", "read")
         ), "permissions.xml");
+        
         ear.addAsModule(ejbJar); 
+        
+        File[] files = resolver().loadPomFromFile("pom.xml").importRuntimeDependencies()
+				.resolve("org.awaitility:awaitility:3.1.6").withTransitivity().asFile();
+        
+        ear.addAsLibraries(files); 
 		return ear;
-	}
-
-//	private final static String QUEUE_WORKING_LOOKUP = "java:jboss/deliveryactive/MDBWithAnnotationQueue";
-//	private final static String QUEUE_OLDSPECS_LOOKUP = "java:jboss/deliveryactive/MDBWithDeploymentDescriptorQueue";
+	} 
+	
 	private final static String QUEUE_WORKING_LOOKUP = "java:/jms/queue/ExpiryQueue";
 	private final static String QUEUE_OLDSPECS_LOOKUP = "java:/jms/queue/DLQ";
 
-//	@ArquillianResource
-//    private ManagementClient managementClient;
 
     private static final int TIMEOUT = TimeoutUtil.adjust(5000);
-//
-//    static class JmsQueueSetup implements ServerSetupTask {
-//
-//        private JMSOperations jmsAdminOperations;
-//
-//        @Override
-//        public void setup(ManagementClient managementClient, String containerId) throws Exception {
-//            jmsAdminOperations = JMSOperationsProvider.getInstance(managementClient);
-//            jmsAdminOperations.createJmsQueue("deliveryactive/MDBWithAnnotationQueue", "java:jboss/deliveryactive/MDBWithAnnotationQueue");
-//            jmsAdminOperations.createJmsQueue("deliveryactive/MDBWithDeploymentDescriptorQueue", "java:jboss/deliveryactive/MDBWithDeploymentDescriptorQueue");
-//        }
-//
-//        @Override
-//        public void tearDown(ManagementClient managementClient, String containerId) throws Exception {
-//            if (jmsAdminOperations != null) {
-//                jmsAdminOperations.removeJmsQueue("deliveryactive/MDBWithAnnotationQueue");
-//                jmsAdminOperations.removeJmsQueue("deliveryactive/MDBWithDeploymentDescriptorQueue");
-//                jmsAdminOperations.close();
-//            }
-//        }
-//    }
+ 
 	@EJB
 	private WorkingBean workingBean;
 
@@ -182,13 +166,14 @@ public class MDBTestCase {
 	@Test
 	public void testWorkingBean() throws Exception {
 		logger.info("starting message driven bean test");
-//		 doDeliveryActive(queueWorking, QUEUE_WORKING_LOOKUP);
 		
 		JMSContext context = cf.createContext(AUTO_ACKNOWLEDGE);
 		context.createProducer().send(queueWorking, "need a pause");
-		Message message = context.createConsumer(queueWorking).receive(TIMEOUT);
-		assertNotNull("the message is received by the mdb: ", message);
-		System.out.println(WorkingBean.taken);
+		final	JMSConsumer consumer = context.createConsumer(queueWorking);
+		  
+		Message message = consumer.receive(TIMEOUT);
+		
+		assertNull("the message is received by the mdb: ", message);
 		assertTrue("the mdb was executed", workingBean.taken);
 		context.close();
 	}
@@ -197,86 +182,12 @@ public class MDBTestCase {
 	public void testOldSpecs() throws Exception {
 		logger.info("starting old specs test");
 		JMSContext context = cf.createContext(AUTO_ACKNOWLEDGE);
-		context.createProducer().send(queueOldSpecs, "need a pause");
+		
+		context.createProducer().send(queueOldSpecs, "need a pause");		
 		Message message = context.createConsumer(queueOldSpecs).receive(TIMEOUT);
-		assertNotNull("the message is received by the mdb: ", message);
+		assertNull("the message is received by the mdb: ", message);
+		
 		assertTrue("created oldSpecsWorkingBean", OldSpecsWorkingBean.received);
 		context.close();
-	}
-//    private void doDeliveryActive(Destination destination, String mdbName) throws Exception {
-//        // ReplyingMDB has been deployed with deliveryActive set to false
-//        assertMDBDeliveryIsActive(mdbName, false);
-//
-//        Connection connection = null;
-//
-//        try {
-//            connection = cf.createConnection();
-//            connection.start();
-//
-//            Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-//            TemporaryQueue replyQueue = session.createTemporaryQueue();
-//
-//            // send a message to the MDB
-//            MessageProducer producer = session.createProducer(destination);
-//            Message message = session.createMessage();
-//            message.setJMSReplyTo(replyQueue);
-//            producer.send(message);
-//
-//            // the MDB did not reply to the message because its delivery is not active
-//            MessageConsumer consumer = session.createConsumer(replyQueue);
-//            Message reply = consumer.receive(TIMEOUT);
-//            assertNull(reply);
-//
-//            executeMDBOperation(mdbName, "start-delivery");
-//            assertMDBDeliveryIsActive(mdbName, true);
-//            // WFLY-4470 check duplicate message when start delivery twice. Last assertNull(reply) should still be valid
-//            executeMDBOperation(mdbName, "start-delivery");
-//
-//            // the message was delivered to the MDB which replied
-//            reply = consumer.receive(TIMEOUT);
-//            assertNotNull(reply);
-//            assertEquals(message.getJMSMessageID(), reply.getJMSCorrelationID());
-//
-//            executeMDBOperation(mdbName, "stop-delivery");
-//            assertMDBDeliveryIsActive(mdbName, false);
-//
-//            // send again a message to the MDB
-//            message = session.createMessage();
-//            message.setJMSReplyTo(replyQueue);
-//            producer.send(message);
-//
-//            // the MDB did not reply to the message because its delivery is not active
-//            reply = consumer.receive(TIMEOUT);
-//            assertNull(reply);
-//        } finally {
-//            if (connection != null) {
-//                connection.close();
-//            }
-//        }
-//    }
-//    private void executeMDBOperation(String mdbName, String opName) throws IOException {
-//        ModelNode operation = createMDBOperation(mdbName);
-//        operation.get(OP).set(opName);
-//        ModelNode result = managementClient.getControllerClient().execute(operation);
-//
-//        assertTrue(result.toJSONString(true), result.hasDefined(OUTCOME));
-//        assertEquals(result.toJSONString(true), SUCCESS, result.get(OUTCOME).asString());
-//    }
-//    private void assertMDBDeliveryIsActive(String mdbName, boolean expected) throws IOException {
-//        ModelNode operation = createMDBOperation(mdbName);
-//        operation.get(OP).set(READ_ATTRIBUTE_OPERATION);
-//        operation.get(NAME).set("delivery-active");
-//        ModelNode result = managementClient.getControllerClient().execute(operation);
-//
-//        assertTrue(result.toJSONString(true), result.hasDefined(OUTCOME));
-//        assertEquals(result.toJSONString(true), expected, result.get(RESULT).asBoolean());
-//    }
-
-    private ModelNode createMDBOperation(String mdbName) {
-        ModelNode operation = new ModelNode();
-        operation.get(OP_ADDR).add("deployment", "mdb.jar");
-        operation.get(OP_ADDR).add("subsystem", "ejb3");
-        operation.get(OP_ADDR).add("message-driven-bean", mdbName);
-        return operation;
-    }
+	} 
 }
