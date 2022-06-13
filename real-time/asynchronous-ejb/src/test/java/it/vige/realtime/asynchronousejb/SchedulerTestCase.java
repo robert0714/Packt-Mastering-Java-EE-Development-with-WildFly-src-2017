@@ -29,8 +29,8 @@ import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.EnterpriseArchive;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.awaitility.Duration;
+import org.junit.runner.RunWith; 
+import java.time.Duration;
 import it.vige.realtime.asynchronousejb.scheduler.SchedulerBean;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
@@ -51,7 +51,7 @@ public class SchedulerTestCase {
 		ejbJar.addPackage(org.awaitility.Awaitility.class.getPackage());
 		ejbJar.addPackage(org.awaitility.pollinterval.PollInterval.class.getPackage());
 		ejbJar.addPackage(org.awaitility.constraint.WaitConstraint.class.getPackage());
-		ejbJar.addPackage(org.awaitility.core.Predicate.class.getPackage());
+		ejbJar.addPackage(org.awaitility.core.ExceptionIgnorer.class.getPackage());
 		ejbJar.addPackage(org.awaitility.classpath.ClassPathResolver.class.getPackage());
         ear.addAsModule(ejbJar); 
         
@@ -75,10 +75,10 @@ public class SchedulerTestCase {
 		}
 		 
 		await()
-		    .atLeast(Duration.ONE_HUNDRED_MILLISECONDS)
-		    .atMost(Duration.TEN_SECONDS)
-		  .with()
-		    .pollInterval(Duration.ONE_HUNDRED_MILLISECONDS)
+			.atLeast(Duration.ofMillis(500L))
+			.atMost(Duration.ofSeconds(10L))
+		.with()
+			.pollInterval(Duration.ofMillis(500L))
 		    .until(schedulerBean::getLastProgrammaticTimeout, notNullValue() );
 		Date programmaticDate = schedulerBean.getLastProgrammaticTimeout();
 		
@@ -88,10 +88,10 @@ public class SchedulerTestCase {
 				today.compareTo(programmaticDate) < 0);
 		
 		await()
-		    .atLeast(Duration.ONE_HUNDRED_MILLISECONDS)
-		    .atMost(Duration.TEN_SECONDS)
-		   .with()
-		    .pollInterval(Duration.ONE_HUNDRED_MILLISECONDS)
+			.atLeast(Duration.ofMillis(500L))
+			.atMost(Duration.ofSeconds(10L))
+		.with()
+			.pollInterval(Duration.ofMillis(500L))
 		    .until(schedulerBean::getLastAutomaticTimeout , notNullValue() );		
 		Date automaticDate = schedulerBean.getLastAutomaticTimeout();
 		

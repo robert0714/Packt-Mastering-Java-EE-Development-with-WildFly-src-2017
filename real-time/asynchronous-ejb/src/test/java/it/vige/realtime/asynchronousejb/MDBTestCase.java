@@ -42,7 +42,7 @@ import javax.jms.Queue;
 
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.apache.commons.lang3.ArrayUtils;
-import org.awaitility.Duration;
+import java.time.Duration;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.as.arquillian.container.ManagementClient;

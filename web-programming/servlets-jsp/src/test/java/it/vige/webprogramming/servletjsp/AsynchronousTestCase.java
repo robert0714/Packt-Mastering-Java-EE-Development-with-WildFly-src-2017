@@ -4,6 +4,7 @@ import static java.util.logging.Logger.getLogger;
 import static org.jboss.shrinkwrap.api.ShrinkWrap.create;
 import static org.jboss.shrinkwrap.api.asset.EmptyAsset.INSTANCE;
 import static org.junit.Assert.assertEquals;
+import static org.jboss.shrinkwrap.resolver.api.maven.Maven.resolver;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -43,6 +44,10 @@ public class AsynchronousTestCase {
 		war.addPackage(AsynchronousServlet.class.getPackage());
 		war.addAsWebInfResource(INSTANCE, "beans.xml");
 		war.addAsWebInfResource(new FileAsset(new File("src/test/resources/web.xml")), "web.xml");
+		File[] files = resolver().loadPomFromFile("pom.xml").importRuntimeDependencies()
+				.resolve("org.w3c.css:sac:1.3").withTransitivity().asFile();
+		war.addPackage(org.codehaus.plexus.util.xml.Xpp3DomBuilder.class.getPackage());  
+		war.addAsLibraries(files);  
 		return war;
 	}
 

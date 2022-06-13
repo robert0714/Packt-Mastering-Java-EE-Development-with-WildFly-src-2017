@@ -22,7 +22,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.net.URL;
-import java.nio.ByteBuffer; 
+import java.nio.ByteBuffer;
+import java.time.Duration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -44,7 +45,6 @@ import javax.websocket.SendResult;
 import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
 
-import org.awaitility.Duration;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -57,7 +57,6 @@ import static org.awaitility.Awaitility.given;
 import static org.awaitility.Awaitility.setDefaultPollDelay;
 import static org.awaitility.Awaitility.setDefaultPollInterval;
 import static org.awaitility.Awaitility.setDefaultTimeout;
-import static org.awaitility.proxy.AwaitilityClassProxy.to;
 import static org.hamcrest.Matchers.equalTo;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -89,7 +88,7 @@ public class SessionServerTestCase {
 		war.addPackage(org.awaitility.Awaitility.class.getPackage());
 		war.addPackage(org.awaitility.pollinterval.PollInterval.class.getPackage());
 		war.addPackage(org.awaitility.constraint.WaitConstraint.class.getPackage());
-		war.addPackage(org.awaitility.core.Predicate.class.getPackage());
+		war.addPackage(org.awaitility.core.ExceptionIgnorer.class.getPackage());
 		war.addAsWebInfResource(new FileAsset(new File("src/main/webapp/WEB-INF/web.xml")), "web.xml");
 		return war;
 	}
@@ -264,10 +263,10 @@ public class SessionServerTestCase {
 			connect();
 			
 			await()
-		      .atLeast(Duration.ONE_HUNDRED_MILLISECONDS)
-		      .atMost(Duration.FIVE_SECONDS)
+		      .atLeast(Duration.ofMillis(500L))
+		      .atMost(Duration.ofSeconds(10L))
 		   .with()
-		      .pollInterval(Duration.ONE_HUNDRED_MILLISECONDS)
+		      .pollInterval(Duration.ofMillis(500L))
 		      .until(sessionServer::isOpen);
 			
 //			while(!sessionServer.isOpen()) {				

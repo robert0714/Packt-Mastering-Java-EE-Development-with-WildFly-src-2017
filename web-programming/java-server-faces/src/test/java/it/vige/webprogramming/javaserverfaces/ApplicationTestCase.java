@@ -154,7 +154,7 @@ public class ApplicationTestCase {
 		addCategory.getInputByName("addCategoryForm:Category").setValueAttribute(categoryToInsert);
 		HtmlSubmitInput submitButton = addCategory.getInputByName("addCategoryForm:editinline");
 		page = submitButton.click();
-		assertTrue("The category is created", page.asNormalizedText().contains(categoryToInsert));
+		assertTrue("The category is created", page.asText().contains(categoryToInsert));
 		HtmlAnchor adminPanel = adminPage.getAnchors().get(1);
 		page = adminPanel.click();
 		button = page.getAnchors().get(6);
@@ -165,26 +165,26 @@ public class ApplicationTestCase {
 		editCategory.getInputByValue(categoryToInsert).setValueAttribute(categoryToUpdate);
 		submitButton = editCategory.getInputByValue(resourceBundle.getString("Update"));
 		page = submitButton.click();
-		assertTrue("The category is updated", page.asNormalizedText().contains(categoryToUpdate));
+		assertTrue("The category is updated", page.asText().contains(categoryToUpdate));
 		button = page.getAnchors().get(7);
 		page = button.click();
 		assertTrue("The category is arrowed up",
-				page.asNormalizedText().indexOf(categoryToUpdate) < page.asNormalizedText().indexOf(firstCategory));
+				page.asText().indexOf(categoryToUpdate) < page.asText().indexOf(firstCategory));
 		button = page.getAnchors().get(4);
 		page = button.click();
 		assertTrue("The category is arrowed down",
-				page.asNormalizedText().indexOf(categoryToUpdate) > page.asNormalizedText().indexOf(firstCategory));
+				page.asText().indexOf(categoryToUpdate) > page.asText().indexOf(firstCategory));
 		button = page.getAnchors().get(8);
 		page = button.click();
 		HtmlForm deleteCategory = page.getForms().get(1);
 		submitButton = deleteCategory.getInputByValue(resourceBundle.getString("Cancel"));
 		page = submitButton.click();
 		assertTrue("The delete is canceled",
-				page.asNormalizedText().contains(firstCategory) && page.asNormalizedText().contains(categoryToUpdate));
+				page.asText().contains(firstCategory) && page.asText().contains(categoryToUpdate));
 		button = page.getAnchors().get(0);
 		page = button.click();
 		assertTrue("In the home page there are two categories",
-				page.asNormalizedText().contains(firstCategory) && page.asNormalizedText().contains(categoryToUpdate));
+				page.asText().contains(firstCategory) && page.asText().contains(categoryToUpdate));
 		button = page.getAnchors().get(1);
 		page = button.click();
 		button = page.getAnchors().get(8);
@@ -192,7 +192,7 @@ public class ApplicationTestCase {
 		deleteCategory = page.getForms().get(1);
 		submitButton = deleteCategory.getInputByValue(resourceBundle.getString("Confirm"));
 		page = submitButton.click();
-		assertTrue("The delete is confirmed", page.asNormalizedText()
+		assertTrue("The delete is confirmed", page.asText()
 				.contains("\"" + categoryToUpdate + "\" " + resourceBundle.getString("Category_deleted_1")));
 	}
 

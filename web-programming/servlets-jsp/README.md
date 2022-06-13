@@ -2,6 +2,8 @@
 Maven Test:
 
 ```shell
+mvn install -pl web-programming/packresources
+mvn install -pl web-programming -DSkipTests
 mvn clean package test -pl web-programming/servlets-jsp
 ```
 WildFly provides a default authentication for the remote client through the `application-users.properties` and `application-roles.properties`.Its default account is `admin`, password is `admin`.
