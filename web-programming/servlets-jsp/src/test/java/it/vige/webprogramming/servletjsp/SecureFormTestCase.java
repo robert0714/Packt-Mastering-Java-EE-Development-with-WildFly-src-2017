@@ -37,7 +37,7 @@ public class SecureFormTestCase {
 
 	private static final Logger logger = getLogger(SecureFormTestCase.class.getName());
 
-	private static final String WILDFLY_VERSION = "13.0.0.Final";
+	private static final String WILDFLY_VERSION = "26.1.1.Final";
 
 	static class SecureResourcesSetupTask implements ServerSetupTask {
 
@@ -67,7 +67,7 @@ public class SecureFormTestCase {
 
 	@Deployment(testable = false)
 	public static WebArchive createDeployment() {
-		WebArchive war = create(WebArchive.class)
+		WebArchive war = create(WebArchive.class, "secure-form-test.war")
 				.addAsWebResource(new File(WEBAPP_SRC + "/view", "secure-form.jsp"), "view/secure-form.jsp")
 				.addAsWebResource(new File(WEBAPP_SRC + "/view", "loginerror.jsp"), "view/loginerror.jsp")
 				.addAsWebResource(new File(WEBAPP_SRC + "/view", "loginform.jsp"), "view/loginform.jsp")

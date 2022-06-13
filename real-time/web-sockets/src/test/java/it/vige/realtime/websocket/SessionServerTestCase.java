@@ -19,14 +19,17 @@ import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.Writer;
 import java.net.URL;
-import java.nio.ByteBuffer;
+import java.nio.ByteBuffer; 
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import javax.websocket.EncodeException;
@@ -41,6 +44,21 @@ import javax.websocket.SendResult;
 import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
 
+import org.awaitility.Duration;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
+import org.awaitility.Awaitility;
+import static org.awaitility.Awaitility.await;
+import static org.awaitility.Awaitility.fieldIn;
+import static org.awaitility.Awaitility.given;
+import static org.awaitility.Awaitility.setDefaultPollDelay;
+import static org.awaitility.Awaitility.setDefaultPollInterval;
+import static org.awaitility.Awaitility.setDefaultTimeout;
+import static org.awaitility.proxy.AwaitilityClassProxy.to;
+import static org.hamcrest.Matchers.equalTo;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.test.api.ArquillianResource;
@@ -48,6 +66,8 @@ import org.jboss.shrinkwrap.api.asset.FileAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+
 
 import it.vige.realtime.websocket.session.SessionMessageHandler;
 import it.vige.realtime.websocket.session.SessionSocketClient;
@@ -66,6 +86,10 @@ public class SessionServerTestCase {
 		final WebArchive war = create(WebArchive.class, "session-test.war");
 		war.addPackage(SessionSocketServer.class.getPackage());
 		war.addAsWebInfResource(INSTANCE, "beans.xml");
+		war.addPackage(org.awaitility.Awaitility.class.getPackage());
+		war.addPackage(org.awaitility.pollinterval.PollInterval.class.getPackage());
+		war.addPackage(org.awaitility.constraint.WaitConstraint.class.getPackage());
+		war.addPackage(org.awaitility.core.Predicate.class.getPackage());
 		war.addAsWebInfResource(new FileAsset(new File("src/main/webapp/WEB-INF/web.xml")), "web.xml");
 		return war;
 	}
@@ -238,9 +262,27 @@ public class SessionServerTestCase {
 			basic.sendText("my text");
 			basic.sendText("my text 2", false);
 			connect();
-			basic = sessionServer.getBasicRemote();
-			assertNotNull("basic sendStream: " + basic.getSendStream());
-			assertNotNull("basic sendWriter: " + basic.getSendWriter());
+			
+			await()
+		      .atLeast(Duration.ONE_HUNDRED_MILLISECONDS)
+		      .atMost(Duration.FIVE_SECONDS)
+		   .with()
+		      .pollInterval(Duration.ONE_HUNDRED_MILLISECONDS)
+		      .until(sessionServer::isOpen);
+			
+//			while(!sessionServer.isOpen()) {				
+//				Thread.sleep(500);
+//				if(sessionServer.isOpen()) {
+//					break;
+//				}
+//			}
+			
+			basic = sessionServer.getBasicRemote(); 
+			
+			final OutputStream sentStream = basic.getSendStream();
+			final Writer writer = basic.getSendWriter();
+			assertNotNull("basic sendStream: " + sentStream);
+			assertNotNull("basic sendWriter: " + writer);
 		} catch (IOException | EncodeException e) {
 			logger.log(SEVERE, "error", e);
 			fail();

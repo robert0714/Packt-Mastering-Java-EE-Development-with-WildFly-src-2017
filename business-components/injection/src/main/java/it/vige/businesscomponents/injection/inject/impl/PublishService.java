@@ -4,7 +4,7 @@ import static it.vige.businesscomponents.injection.inject.model.StateBook.PUBLIS
 import static java.util.Arrays.asList;
 
 import java.util.List;
-
+ 
 import javax.enterprise.inject.Any;
 import javax.enterprise.inject.Disposes;
 import javax.enterprise.inject.Produces;
@@ -12,7 +12,7 @@ import javax.enterprise.inject.Produces;
 import it.vige.businesscomponents.injection.inject.Published;
 import it.vige.businesscomponents.injection.inject.Service;
 import it.vige.businesscomponents.injection.inject.model.Book;
-
+ 
 @Any
 public class PublishService implements Service {
 
@@ -24,7 +24,8 @@ public class PublishService implements Service {
 				new Book("Gatein Cookbook", "Luca Stancapiano", PUBLISHED) };
 		return asList(books);
 	}
-
+	
+    //https://docs.jboss.org/cdi/api/2.0/javax/enterprise/inject/Disposes.html
 	public void close(@Disposes @Published List<Book> books) {
 		books.clear();
 	}

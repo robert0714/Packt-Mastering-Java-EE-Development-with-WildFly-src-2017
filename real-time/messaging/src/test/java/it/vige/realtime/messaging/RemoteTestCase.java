@@ -56,20 +56,23 @@ public class RemoteTestCase {
 
 	private static final Logger logger = getLogger(RemoteTestCase.class.getName());
 
-	private static final String WILDFLY_VERSION = "13.0.0.Final";
+	private static final String WILDFLY_VERSION = "26.1.1.Final";
 
 	static class MessagingResourcesSetupTask implements ServerSetupTask {
 
 		@Override
 		public void setup(ManagementClient managementClient, String containerId) throws Exception {
+			//Setting Wildfy Server's User, password
 			copy(new File("src/test/resources/application-users.properties").toPath(), new File(
 					"target/wildfly-" + WILDFLY_VERSION + "/standalone/configuration/application-users.properties")
 							.toPath(),
 					REPLACE_EXISTING);
+			
 			copy(new File("src/test/resources/application-roles.properties").toPath(), new File(
 					"target/wildfly-" + WILDFLY_VERSION + "/standalone/configuration/application-roles.properties")
 							.toPath(),
 					REPLACE_EXISTING);
+			
 			ModelControllerClient modelControllerClient = managementClient.getControllerClient();
 			JMSOperations jmsOperations = getInstance(modelControllerClient);
 			jmsOperations.createJmsQueue(REMOTE_QUEUE_NAME, REMOTE_EXPORTED_QUEUE_LOOKUP);
@@ -86,6 +89,7 @@ public class RemoteTestCase {
 	@Deployment
 	public static JavaArchive createEJBDeployment() {
 		final JavaArchive jar = create(JavaArchive.class, "remoting-message.jar");
+		jar.addPackage(JMSOperations.class.getPackage());
 		jar.addAsResource(new FileAsset(new File("src/test/resources/application-users.properties")),
 				"users.properties");
 		jar.addAsResource(new FileAsset(new File("src/test/resources/application-roles.properties")),
@@ -111,9 +115,11 @@ public class RemoteTestCase {
 
 		String question = "how many components in your family?";
 		String response = "they are four";
-
+ 
+		
 		// Create the JMS context
 		JMSContext context = connectionFactory.createContext(USER_NAME, USER_PASSWORD);
+		
 		Questionary questionary = new Questionary();
 		questionary.setQuestion(question);
 		questionary.setResponse(response);

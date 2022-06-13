@@ -3,3 +3,6 @@ target
 .classpath
 .project
 rubia-forums
+.vscode
+/bin/
+.LCKpom.xml~

@@ -142,6 +142,33 @@
 							</execution>
 						</executions>
 					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-resources-plugin</artifactId>
+						<version>3.1.0</version>
+						<executions combine.children="append">
+                            <!--  Setting Wildfy Server's User, password -->
+							<!--  Copy users and roles config from shared resources. --> 
+				          <execution>
+							<id>ts.config-as.copy-mgmt-users</id>
+							<phase>generate-test-resources</phase>
+							<goals>
+								<goal>copy-resources</goal>
+							</goals>
+							<inherited>true</inherited>
+				            <configuration>
+				              <outputDirectory>${basedir}/target/wildfly-${org.wildfly.as.version}/standalone/configuration/</outputDirectory>
+				              <overwrite>true</overwrite>
+	                            <resources>
+	                                <resource>
+	                                    <directory>${basedir}/src/test/resources</directory>
+	                                    <includes><include>*.properties</include></includes>
+	                                </resource>
+	                            </resources>				                          
+				            </configuration>            
+				          </execution>
+				        </executions>
+				      </plugin>
 				</plugins>
 			</build>
 		</profile>

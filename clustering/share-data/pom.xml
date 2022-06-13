@@ -12,7 +12,21 @@
 	<packaging>ejb</packaging>
 	<name>Share your data</name>
 	<description>Chapter 17: Share your data</description>
+    <!-- <properties>
+		<maven.compiler.source>11</maven.compiler.source>
+		<maven.compiler.target>11</maven.compiler.target> -->
 
+		<!-- https://github.com/flashboss/rubia-forums/blob/2.2.3/pom.xml is latest jdk8 version -->
+		<!-- <rubiaforums.version>3.1.1</rubiaforums.version>		
+	</properties> -->
+	<dependencies>
+		<dependency>
+		    <groupId>org.wildfly</groupId>
+		    <artifactId>wildfly-web-common</artifactId>
+		    <version>${org.wildfly.as.version}</version>
+		    <scope>test</scope>
+		</dependency>
+	</dependencies>
 	<build>
 		<defaultGoal>package</defaultGoal>
 		<finalName>share-data</finalName>

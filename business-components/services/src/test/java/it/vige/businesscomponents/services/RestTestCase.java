@@ -16,6 +16,7 @@ import static org.jboss.shrinkwrap.api.asset.EmptyAsset.INSTANCE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.net.URL;
@@ -25,6 +26,7 @@ import java.util.logging.Logger;
 import javax.net.ssl.HostnameVerifier;
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
@@ -77,7 +79,8 @@ public class RestTestCase {
 			target.request().post(valuesAsArray);
 			fail();
 		} catch (ProcessingException ex) {
-			assertEquals("Arrays not supported", "RESTEASY004655: Unable to invoke request", ex.getMessage());
+//			assertEquals("Arrays not supported", "RESTEASY004655: Unable to invoke request", ex.getMessage());
+			assertTrue("could not find writer for content-type text/plain type: [D", ex.getMessage().contains("RESTEASY004655: Unable to invoke request" ));
 		}
 		Entity<List<Double>> valuesAsList = entity(asList(new Double[] { 4.5, 6.7 }), TEXT_PLAIN);
 		try (Response response = target.request().post(valuesAsList)) {
@@ -100,7 +103,7 @@ public class RestTestCase {
 	@Test
 	public void testRestEasyGet() throws Exception {
 		logger.info("start REST Easy Get test");
-		ResteasyClient client = new ResteasyClientBuilder().build();
+		Client client = ClientBuilder.newBuilder().build();
 		WebTarget target = client.target(url + "services/calculator/sub?value=40&value=6");
 		Response response = target.request().get();
 		double value = response.readEntity(Double.class);

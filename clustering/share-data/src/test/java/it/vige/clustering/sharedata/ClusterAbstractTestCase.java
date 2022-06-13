@@ -22,6 +22,7 @@
 package it.vige.clustering.sharedata;
 
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.apache.http.Header;
@@ -36,6 +37,7 @@ import org.jboss.logging.Logger;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
+ 
 
 import it.vige.clustering.sharedata.singleton.ClusteringConstants;
 
@@ -70,12 +72,14 @@ public abstract class ClusterAbstractTestCase implements ClusteringConstants {
 		NODE_TO_DEPLOYMENT.put(NODE_2, DEPLOYMENT_2);
 	}
 
-	protected static Map.Entry<String, String> parseSessionRoute(HttpResponse response) {
+	protected static Map.Entry<CharSequence, CharSequence> parseSessionRoute(HttpResponse response) {
 		Header setCookieHeader = response.getFirstHeader("Set-Cookie");
 		if (setCookieHeader == null)
 			return null;
 		String setCookieValue = setCookieHeader.getValue();
-		return routing.parse(setCookieValue.substring(setCookieValue.indexOf('=') + 1, setCookieValue.indexOf(';')));
+		String data = setCookieValue.substring(setCookieValue.indexOf('=') + 1, setCookieValue.indexOf(';'));
+		  
+		return routing.parse(data);
 	}
 
 	@ArquillianResource

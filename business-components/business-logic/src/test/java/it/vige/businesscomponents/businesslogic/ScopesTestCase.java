@@ -11,11 +11,17 @@ import java.util.logging.Logger;
 import javax.inject.Inject;
 
 import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.arquillian.junit.Arquillian; 
 import org.jboss.shrinkwrap.api.asset.FileAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import it.vige.businesscomponents.businesslogic.context.nnn.EngineRemote;
+import it.vige.businesscomponents.businesslogic.context.old.Ejb21LocalHome;
+import it.vige.businesscomponents.businesslogic.exception.RequiredBean;
+import it.vige.businesscomponents.businesslogic.interfaces.AllTopics;
+import it.vige.businesscomponents.businesslogic.security.*; 
 
 @RunWith(Arquillian.class)
 public class ScopesTestCase {
@@ -37,8 +43,12 @@ public class ScopesTestCase {
 	public static JavaArchive createEJBDeployment() {
 		final JavaArchive jar = create(JavaArchive.class, "scopes-test.jar");
 		jar.addPackage(MyPosts.class.getPackage());
+		jar.addPackage(EngineRemote.class.getPackage());
+		jar.addPackage(Ejb21LocalHome.class.getPackage());
+		jar.addPackage(RequiredBean.class.getPackage()); 
+		jar.addPackages(true, AllTopics.class.getPackage(), Movies.class.getPackage(),EmployeeBean.class.getPackage(),ManagerBean.class.getPackage()  );
 		jar.addAsManifestResource(new FileAsset(new File("src/test/resources/META-INF/persistence-test.xml")),
-				"persistence.xml");
+				"persistence.xml"); 
 		return jar;
 	}
 

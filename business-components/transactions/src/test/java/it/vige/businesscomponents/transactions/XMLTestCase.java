@@ -32,6 +32,10 @@ import org.junit.runner.RunWith;
 
 import it.vige.businesscomponents.transactions.remote.XMLRemote;
 
+/**
+ * You can compare it.vige.businesscomponents.businesslogic.RemotingNamingTestCase
+ * 
+ * **/
 @RunWith(Arquillian.class)
 public class XMLTestCase {
 
@@ -48,6 +52,10 @@ public class XMLTestCase {
 		jar.addPackage(XMLRemote.class.getPackage());
 		jar.addAsManifestResource(new FileAsset(new File("src/test/resources/META-INF/ejb-jar.xml")), "ejb-jar.xml");
 		ear.addAsModule(jar);
+		
+		//Because current Test will automately add other classes in the same package. 
+//		jar.deleteClass(DistributedTestCase.class);
+		
 		return ear;
 	}
 
@@ -59,7 +67,7 @@ public class XMLTestCase {
 		try {
 			createInitialContext();
 			final UserTransaction userTransaction = getInstance().getUserTransaction();
-			XMLRemote bean = lookup(XMLRemote.class, "bank");
+			XMLRemote bean = lookupV1(XMLRemote.class, "bank");
 			assertEquals(STATUS_NO_TRANSACTION, bean.transactionStatus());
 
 			try {
@@ -75,27 +83,40 @@ public class XMLTestCase {
 	}
 
 	@SuppressWarnings("unchecked")
-	private <T> T lookup(Class<T> bank, String beanName) throws NamingException {
+	private <T> T lookupV1(Class<T> bank, String beanName) throws NamingException {
 
 		final String appName = "xml-test";
 		final String moduleName = "remoting";
 		final String distinctName = "";
 		final String viewClassName = bank.getName();
-
+		final String lookUpName = "" + appName + "/" + moduleName + "/" + distinctName + "/" + beanName + "!" + viewClassName;
+		System.out.println("lookUpName: " + lookUpName);
 		return (T) context
-				.lookup("" + appName + "/" + moduleName + "/" + distinctName + "/" + beanName + "!" + viewClassName);
+				.lookup(lookUpName);
+	}
+	@SuppressWarnings("unchecked")
+	private <T> T lookupV2(Class<T> bank, String beanName) throws NamingException {
+
+		final String appName = "xml-test";
+		final String moduleName = "remoting";
+		final String distinctName = "";
+		final String viewClassName = bank.getName();
+       
+		final String lookUpName = "ejb:" + appName + "/" + moduleName + "/" + (  (distinctName.length()>0)? (distinctName+"/"):"" ) +    beanName + "!" + viewClassName;
+		System.out.println("lookUpName: " + lookUpName);
+		return (T) context.lookup(lookUpName);
 	}
 
 	private void createInitialContext() throws NamingException {
-		Properties prop = new Properties();
+		Properties jndiProperties = new Properties();
 
-		prop.put(INITIAL_CONTEXT_FACTORY, "org.jboss.naming.remote.client.InitialContextFactory");
-		prop.put(PROVIDER_URL, REMOTING_PROTOCOL + "://127.0.0.1:" + REMOTING_PORT);
-		prop.put(SECURITY_PRINCIPAL, "admin");
-		prop.put(SECURITY_CREDENTIALS, "secret123!");
-		prop.put("jboss.naming.client.ejb.context", true);
+		jndiProperties.put(INITIAL_CONTEXT_FACTORY, "org.jboss.naming.remote.client.InitialContextFactory");
+		jndiProperties.put(PROVIDER_URL, REMOTING_PROTOCOL + "://127.0.0.1:" + REMOTING_PORT);
+//		jndiProperties.put(SECURITY_PRINCIPAL, "admin");
+//		jndiProperties.put(SECURITY_CREDENTIALS, "secret123!");
+		jndiProperties.put("jboss.naming.client.ejb.context", true);
 
-		context = new InitialContext(prop);
+		context = new InitialContext(jndiProperties);
 	}
 
 	private void closeContext() throws NamingException {

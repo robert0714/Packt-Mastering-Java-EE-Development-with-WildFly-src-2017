@@ -21,8 +21,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.subethamail.smtp.server.SMTPServer;
-
+import org.subethamail.smtp.server.SMTPServer;  
+//import org.eclipse.aether.internal.impl.collect.DefaultDependencyCollector;
+//import org.eclipse.aether.internal.impl.DefaultDependencyCollector ; 
 @RunWith(Arquillian.class)
 public class SendMailTestCase {
 

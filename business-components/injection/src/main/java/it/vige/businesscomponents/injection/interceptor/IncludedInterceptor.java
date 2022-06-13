@@ -18,7 +18,7 @@ public class IncludedInterceptor {
 	private static final Logger logger = getLogger(IncludedInterceptor.class.getName());
 
 	@AroundInvoke
-	public Object aroundInvoke(InvocationContext ic) throws Exception {
+	public Object aroundInvoke(final InvocationContext ic) throws Exception {
 		String methodName = ic.getMethod().getName();
 		logger.info("Executing " + ic.getTarget().getClass().getSimpleName() + "." + methodName + " method");
 		Object[] parameters = (Object[]) ic.getParameters();
@@ -27,9 +27,17 @@ public class IncludedInterceptor {
 			Item item = (Item) parameters[0];
 			logger.info("item: " + item.getName());
 		}
-		Map<String, Object> contextData = ic.getContextData();
-		if (!contextData.isEmpty())
+		final Map<String, Object> contextData = ic.getContextData();
+		if (!contextData.isEmpty()) {
+			Object tmp = contextData.get("test_trace");
+			System.out.println("-------robert------IncludedInterceptor(2)");
+			System.out.println(ic.getClass().getName());
+			System.out.println(ic);
+			System.out.println(tmp);
+			System.out.println("-------robert------IncludedInterceptor(2)");
 			getItemHistory().add(contextData.get("test_trace") + "");
+		}
+			 
 		return ic.proceed();
 	}
 

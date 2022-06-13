@@ -49,6 +49,7 @@ public class SchedulerTestCase {
 			logger.log(SEVERE, "Interruption", e);
 		}
 		Date programmaticDate = schedulerBean.getLastProgrammaticTimeout();
+		System.out.println(programmaticDate);
 		assertNotNull("the programmatic date is created", programmaticDate);
 		assertTrue("the programmatic date is 10 milliseconds around instead of the today date",
 				today.compareTo(programmaticDate) < 0);

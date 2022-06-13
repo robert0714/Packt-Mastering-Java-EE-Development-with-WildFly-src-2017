@@ -47,7 +47,7 @@ public class SecureServletTestCase {
 
 	private static final Logger logger = getLogger(SecureServletTestCase.class.getName());
 
-	private static final String WILDFLY_VERSION = "13.0.0.Final";
+	private static final String WILDFLY_VERSION = "26.1.1.Final";
 
 	static class SecureResourcesSetupTask implements ServerSetupTask {
 
@@ -77,7 +77,9 @@ public class SecureServletTestCase {
 
 	@Deployment(testable = false)
 	public static WebArchive createDeployment() {
-		WebArchive war = create(WebArchive.class).addClass(SecureServlet.class).addClass(LoginServlet.class)
+		WebArchive war = create(WebArchive.class, "secure-servlet-test.war")
+		.addClass(SecureServlet.class)
+		.addClass(LoginServlet.class)
 				.addAsWebInfResource((new File("src/test/resources/web-secure.xml")), "web.xml");
 		return war;
 	}
@@ -198,7 +200,7 @@ public class SecureServletTestCase {
 	public void testUnauthenticatedRequest() throws IOException, SAXException {
 		logger.info("start unauthenticated request");
 		HtmlPage page = webClient.getPage(base + "LoginServlet");
-		String responseText = page.asText();
+		String responseText = page.asNormalizedText();
 		assertTrue("Is User in Role", responseText.contains("isUserInRole?false"));
 		assertTrue("Get Remote User", responseText.contains("getRemoteUser?null"));
 		assertTrue("Get User Principal", responseText.contains("getUserPrincipal?null"));

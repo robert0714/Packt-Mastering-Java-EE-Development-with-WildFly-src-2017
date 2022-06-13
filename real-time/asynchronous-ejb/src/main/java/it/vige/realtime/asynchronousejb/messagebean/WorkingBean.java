@@ -14,10 +14,19 @@ import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.TextMessage;
 
-@MessageDriven(mappedName = "jms/queue", activationConfig = {
+import org.jboss.ejb3.annotation.DeliveryActive;
+
+/**
+ * Message-Driven Bean implementation class for: WorkingBean <br/>
+ * propertyValue = "java:jms/queue/ExpiryQueue" <br/>
+ * propertyValue = "java:jboss/deliveryactive/MDBWithAnnotationQueue" <br/>
+ */
+@MessageDriven(name  = "WorkingBean", activationConfig = {
 		@ActivationConfigProperty(propertyName = "destination", propertyValue = "java:jms/queue/ExpiryQueue"),
 		@ActivationConfigProperty(propertyName = "acknowledgeMode", propertyValue = "Auto-acknowledge"),
 		@ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Queue") })
+//Do not deliver messages to this MDB until start-delivery management operation is explicitly called on it.
+@DeliveryActive(false)
 public class WorkingBean implements MessageListener {
 
 	private static final Logger logger = getLogger(WorkingBean.class.getName());
@@ -31,6 +40,9 @@ public class WorkingBean implements MessageListener {
 	public void onMessage(Message message) {
 		TextMessage msg = null;
 		try {
+			System.out.println("---------------------------------");
+			System.out.println(message.getClass().getCanonicalName());
+			
 			if (message instanceof TextMessage) {
 				msg = (TextMessage) message;
 				logger.info("MESSAGE BEAN: Message received: " + msg.getText());

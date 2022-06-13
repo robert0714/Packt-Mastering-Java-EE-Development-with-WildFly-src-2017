@@ -12,10 +12,14 @@ import javax.ejb.MessageDrivenContext;
 import javax.jms.Message;
 import javax.jms.MessageListener;
 
-@MessageDriven(mappedName = "jms/queue", activationConfig = {
-		@ActivationConfigProperty(propertyName = "destination", propertyValue = "java:jms/queue/DLQ"),
-		@ActivationConfigProperty(propertyName = "acknowledgeMode", propertyValue = "Auto-acknowledge"),
-		@ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Queue") })
+import org.jboss.ejb3.annotation.DeliveryActive;
+
+@MessageDriven
+// (name  = "OldSpecsWorkingBean", activationConfig = {
+// 		@ActivationConfigProperty(propertyName = "destination", propertyValue = "java:jboss/deliveryactive/MDBWithDeploymentDescriptorQueue"),
+// 		@ActivationConfigProperty(propertyName = "acknowledgeMode", propertyValue = "Auto-acknowledge"),
+// 		@ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Queue") })
+@DeliveryActive(false)
 public class OldSpecsWorkingBean implements MessageListener, MessageDrivenBean {
 
 	private static final long serialVersionUID = -2127857668359011883L;

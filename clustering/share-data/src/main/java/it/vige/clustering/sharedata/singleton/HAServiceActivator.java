@@ -3,7 +3,7 @@ package it.vige.clustering.sharedata.singleton;
 import static it.vige.clustering.sharedata.singleton.ClusteringConstants.NODE_2;
 import static org.jboss.as.server.ServerEnvironmentService.SERVICE_NAME;
 import static org.jboss.msc.service.ServiceName.JBOSS;
-import static org.wildfly.clustering.singleton.SingletonServiceName.BUILDER;
+// import static org.wildfly.clustering.singleton.SingletonServiceName.BUILDER;
 
 import org.jboss.as.server.ServerEnvironment;
 import org.jboss.msc.service.ServiceActivator;
@@ -27,14 +27,16 @@ public class HAServiceActivator implements ServiceActivator {
 	@Override
 	public void activate(ServiceActivatorContext context) {
 		ServiceTarget target = context.getServiceTarget();
-		try {
-			SingletonServiceBuilderFactory factory = (SingletonServiceBuilderFactory) context.getServiceRegistry()
-					.getRequiredService(BUILDER.getServiceName(CONTAINER_NAME)).awaitValue();
+		//try {
+			SingletonServiceBuilderFactory factory = null;
+			//FIXME
+			// (SingletonServiceBuilderFactory) context.getServiceRegistry()
+					// .getRequiredService(BUILDER.getServiceName(CONTAINER_NAME)).awaitValue();
 			install(target, factory, DEFAULT_SERVICE_NAME, 1);
 			install(target, factory, QUORUM_SERVICE_NAME, 2);
-		} catch (InterruptedException e) {
-			throw new ServiceRegistryException(e);
-		}
+		//} catch (InterruptedException e) {
+		//	throw new ServiceRegistryException(e);
+		//}
 	}
 
 	private static void install(ServiceTarget target, SingletonServiceBuilderFactory factory, ServiceName name,

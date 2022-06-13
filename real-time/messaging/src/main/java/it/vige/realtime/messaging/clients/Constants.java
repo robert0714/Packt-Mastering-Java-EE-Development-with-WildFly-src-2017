@@ -3,7 +3,7 @@ package it.vige.realtime.messaging.clients;
 public interface Constants {
 
 	String USER_NAME = "my-user";
-	String USER_PASSWORD = "my-pass";
+	String USER_PASSWORD = "admin";
 	
 	String QUEUE_NAME = "gps_coordinates";
 	String QUEUE_LOOKUP = "java:/jms/queue/GPS";
