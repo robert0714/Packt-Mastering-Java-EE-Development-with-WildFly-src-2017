@@ -27,6 +27,7 @@ import org.jboss.msc.service.ServiceActivator;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -34,6 +35,8 @@ import it.vige.clustering.sharedata.singleton.HAService;
 import it.vige.clustering.sharedata.singleton.HAServicePolicyActivator;
 import it.vige.clustering.sharedata.singleton.HAServiceServlet;
 
+//FIXME
+@Ignore
 @RunWith(Arquillian.class)
 @RunAsClient
 public class SingletonPolicyServiceTestCase extends ClusterAbstractTestCase {

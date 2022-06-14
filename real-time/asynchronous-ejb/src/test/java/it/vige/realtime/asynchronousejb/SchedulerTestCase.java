@@ -75,10 +75,10 @@ public class SchedulerTestCase {
 		}
 		 
 		await()
-			.atLeast(Duration.ofMillis(500L))
+			.atLeast(Duration.ofMillis(400L))
 			.atMost(Duration.ofSeconds(10L))
 		.with()
-			.pollInterval(Duration.ofMillis(500L))
+			.pollInterval(Duration.ofMillis(400L))
 		    .until(schedulerBean::getLastProgrammaticTimeout, notNullValue() );
 		Date programmaticDate = schedulerBean.getLastProgrammaticTimeout();
 		
@@ -88,10 +88,10 @@ public class SchedulerTestCase {
 				today.compareTo(programmaticDate) < 0);
 		
 		await()
-			.atLeast(Duration.ofMillis(500L))
+			.atLeast(Duration.ofMillis(400L))
 			.atMost(Duration.ofSeconds(10L))
 		.with()
-			.pollInterval(Duration.ofMillis(500L))
+			.pollInterval(Duration.ofMillis(400L))
 		    .until(schedulerBean::getLastAutomaticTimeout , notNullValue() );		
 		Date automaticDate = schedulerBean.getLastAutomaticTimeout();
 		

@@ -83,9 +83,10 @@ public class MailJobTestCase {
 	public static WebArchive createWebDeployment() {
 		final WebArchive war = create(WebArchive.class, "mailjob-test.war");
 		File[] files = resolver().loadPomFromFile("pom.xml").importRuntimeDependencies()
-				.resolve("org.subethamail:subethasmtp:3.1.7").withTransitivity().asFile();
-		File[] files02 = resolver().loadPomFromFile("pom.xml").importRuntimeDependencies()
-				.resolve("org.awaitility:awaitility:3.1.6").withTransitivity().asFile();
+				.resolve("org.subethamail:subethasmtp:3.1.7",
+				        "org.awaitility:awaitility:3.1.6")
+				.withTransitivity().asFile();
+		 
 		
 		war.addPackage(MailBatchlet.class.getPackage());
 		
@@ -96,7 +97,7 @@ public class MailJobTestCase {
 		war.addAsWebInfResource(new FileAsset(new File("src/main/resources/META-INF/batch-jobs/" + JOB_NAME + ".xml")),
 				"classes/META-INF/batch-jobs/" + JOB_NAME + ".xml");
 		
-		war.addAsLibraries(ArrayUtils.addAll(files, files02)); 
+		war.addAsLibraries(files); 
 		return war;
 	}
 
