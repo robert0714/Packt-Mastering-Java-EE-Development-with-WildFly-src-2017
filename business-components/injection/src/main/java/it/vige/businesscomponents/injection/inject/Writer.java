@@ -1,5 +1,7 @@
 package it.vige.businesscomponents.injection.inject;
 
-public interface Writer {
+import it.vige.businesscomponents.injection.inject.profile.ProfileType;
 
+public interface Writer {
+	ProfileType type();
 }

@@ -31,8 +31,7 @@ import org.eclipse.jgit.util.Paths;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
-import org.junit.Ignore;
+import org.jboss.shrinkwrap.api.spec.JavaArchive; 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -53,20 +52,23 @@ import it.vige.businesscomponents.injection.inject.impl.RevisionService;
 import it.vige.businesscomponents.injection.inject.impl.RevisionWriter;
 import it.vige.businesscomponents.injection.inject.model.Book;
 import it.vige.businesscomponents.injection.inject.produces.UserNumberBean;
+import it.vige.businesscomponents.injection.inject.profile.Profile;
+import it.vige.businesscomponents.injection.inject.profile.ProfileType;
 import it.vige.businesscomponents.injection.inject.veto.MockBean;
 import it.vige.businesscomponents.injection.inject.veto.TestBean;
 
-//FIXME
-@Ignore
+
 @RunWith(Arquillian.class)
 public class InjectTestCase {
 
 	private static final Logger logger = getLogger(InjectTestCase.class.getName());
 
 	@Inject
+	@Profile(ProfileType.COMMENT)
 	private Writer writer;
 
 	@Inject
+	@it.vige.businesscomponents.injection.inject.profile.Book
 	private Service service;
 
 	@Inject
@@ -110,17 +112,17 @@ public class InjectTestCase {
 	public static Archive<?> createJavaDeployment() {
 		final JavaArchive jar = create(JavaArchive.class, "inject-test.jar");
 		jar.addPackage(Service.class.getPackage());
+		jar.addPackage(ProfileType.class.getPackage());
 		jar.addPackage(CommentService.class.getPackage())
 		;
-//		   .deleteClass(RevisionWriter.class)
-//		   .deleteClass(PublishService.class) 
-//		   .deleteClass(CommentService.class);
+
 		
 		jar.addPackage(Book.class.getPackage());
 		jar.addPackage(UserNumberBean.class.getPackage());
 		jar.addPackage(Bank.class.getPackage());
 		jar.addPackage(MockBean.class.getPackage()); 
 		jar.addAsManifestResource(INSTANCE, "beans.xml"); 
+		System.out.println(jar.toString(true)); 
 		return jar;
 	}
 

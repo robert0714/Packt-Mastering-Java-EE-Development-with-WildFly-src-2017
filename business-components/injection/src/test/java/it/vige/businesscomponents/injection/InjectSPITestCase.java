@@ -162,7 +162,7 @@ public class InjectSPITestCase {
 		assertEquals(
 				"the extension works at the start of the cdi engine, so it is not started by a bean. In this case it works before the injection",
 				1, observerExtension.getBeforeBeanDiscovery());
-		assertEquals("In this case we see the process annotated types", 28,
+		assertEquals("In this case we see the process annotated types", 17,
 				observerExtension.getProcessAnnotatedType());
 		assertEquals("In this case we see the process annotated types with annotations", 1,
 				observerExtension.getProcessAnnotatedTypeWithAnnotations());

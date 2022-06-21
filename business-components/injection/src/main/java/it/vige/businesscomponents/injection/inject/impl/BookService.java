@@ -17,6 +17,7 @@ import it.vige.businesscomponents.injection.inject.Published;
 import it.vige.businesscomponents.injection.inject.Service;
 import it.vige.businesscomponents.injection.inject.model.Book;
 
+@it.vige.businesscomponents.injection.inject.profile.Book
 public class BookService implements Service {
 
 	@Draft
