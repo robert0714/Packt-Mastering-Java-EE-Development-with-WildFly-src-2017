@@ -167,14 +167,14 @@ public class InjectSPITestCase {
 		assertEquals("In this case we see the process annotated types with annotations", 1,
 				observerExtension.getProcessAnnotatedTypeWithAnnotations());
 		assertEquals("In this case we see the after discovery", 1, observerExtension.getAfterBeanDiscovery());
-		assertEquals("In this case we see the process bean", 554, observerExtension.getProcessBean());
-		assertEquals("In this case we see the process bean attributes", 102,
+		assertEquals("In this case we see the process bean", 483, observerExtension.getProcessBean());
+		assertEquals("In this case we see the process bean attributes", 91,
 				observerExtension.getProcessBeanAttributes());
-		assertEquals("In this case we see the process injection point", 116,
+		assertEquals("In this case we see the process injection point", 84,
 				observerExtension.getProcessInjectionPoint());
-		assertEquals("In this case we see the process injection target", 30,
+		assertEquals("In this case we see the process injection target", 19,
 				observerExtension.getProcessInjectionTarget());
-		assertEquals("In this case we see the process managed bean", 25, observerExtension.getProcessManagedBean());
+		assertEquals("In this case we see the process managed bean", 14, observerExtension.getProcessManagedBean());
 		assertEquals("In this case we see the process observer method", 0,
 				observerExtension.getProcessObserverMethod());
 		assertEquals("In this case we see the process producer", 77, observerExtension.getProcessProducer());
@@ -182,7 +182,7 @@ public class InjectSPITestCase {
 		assertEquals("In this case we see the process producer method", 77,
 				observerExtension.getProcessProducerMethod());
 		assertEquals("In this case we see the process session bean", 0, observerExtension.getProcessSessionBean());
-		assertEquals("In this case we see the process synthetic annotated type", 16,
+		assertEquals("In this case we see the process synthetic annotated type", 5,
 				observerExtension.getProcessSyntheticAnnotatedType());
 		assertEquals("In this case we see the producer factory", 0, observerExtension.getProducerFactory());
 		assertEquals("In this case we see the after deployment validation", 1,
