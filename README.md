@@ -11,3 +11,7 @@ Luca Stancapiano's books about:
 ```shell
  mvn clean package  -Dmaven.test.failure.ignore=true
 ```
+# Dependencies Export
+```shell
+pache.maven.plugins:maven-dependency-plugin:3.3.0:copy-dependencies -Dmdep.useRepositoryLayout=true -Dmdep.copyPom=true -DoutputDirectory=D:\tmp\mvn_tmp
+```
