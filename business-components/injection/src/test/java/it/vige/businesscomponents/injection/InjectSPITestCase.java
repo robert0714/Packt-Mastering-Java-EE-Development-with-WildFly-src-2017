@@ -1,6 +1,7 @@
 package it.vige.businesscomponents.injection;
 
 import static java.util.logging.Logger.getLogger;
+
 import static javax.enterprise.inject.spi.CDI.current;
 import static org.jboss.shrinkwrap.api.ShrinkWrap.create;
 import static org.jboss.shrinkwrap.api.asset.EmptyAsset.INSTANCE;
@@ -37,6 +38,7 @@ import org.jboss.shrinkwrap.api.asset.FileAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.Ignore;
 
 import it.vige.businesscomponents.injection.inject.spi.AnotherFactory;
 import it.vige.businesscomponents.injection.inject.spi.Car;
@@ -46,6 +48,7 @@ import it.vige.businesscomponents.injection.inject.spi.Taxi;
 import it.vige.businesscomponents.injection.inject.spi.TaxiManager;
 import it.vige.businesscomponents.injection.inject.spi.Toy;
 
+@Ignore
 @RunWith(Arquillian.class)
 public class InjectSPITestCase {
 

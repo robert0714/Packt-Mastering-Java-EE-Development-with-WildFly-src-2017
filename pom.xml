@@ -147,7 +147,7 @@
 				<enabled>true</enabled>
 				<updatePolicy>never</updatePolicy>
 			</snapshots>
-		</repository>
+		</repository>		
     </repositories>
 
     <pluginRepositories>

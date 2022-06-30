@@ -5,7 +5,6 @@ import static java.util.logging.Level.SEVERE;
 import static java.util.logging.Logger.getLogger;
 import static javax.batch.runtime.BatchRuntime.getJobOperator;
 import static javax.batch.runtime.BatchStatus.COMPLETED;
-import org.awaitility.Duration;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -34,6 +33,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.time.Duration;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
@@ -56,7 +56,6 @@ import org.jboss.shrinkwrap.api.asset.FileAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.subethamail.smtp.MessageContext;
@@ -155,19 +154,19 @@ public class MailJobTestCase {
 
 	private void stepExecutions(StepExecution stepExecution, boolean last) {		
 		await()
-			.atLeast(Duration.ONE_HUNDRED_MILLISECONDS)
-			.atMost(Duration.ONE_MINUTE)
+			.atLeast(Duration.ofMillis(400L))
+			.atMost(Duration.ofSeconds(10L))
 		.with()
-			.pollInterval(Duration.ONE_HUNDRED_MILLISECONDS)
+			.pollInterval(Duration.ofMillis(400L))
 			.until(stepExecution::getBatchStatus, equalTo(COMPLETED));
 		
 		assertEquals("the batch has completed", COMPLETED, stepExecution.getBatchStatus());
 		
 		await()
-			.atLeast(Duration.ONE_HUNDRED_MILLISECONDS)
-			.atMost(Duration.ONE_MINUTE)
+			.atLeast(Duration.ofMillis(400L))
+			.atMost(Duration.ofSeconds(10L))
 		.with()
-			.pollInterval(Duration.ONE_HUNDRED_MILLISECONDS)
+			.pollInterval(Duration.ofMillis(400L))
 			.until(stepExecution::getExitStatus, equalTo(COMPLETED.name()));	
 		
 		assertEquals("the batch has completed", COMPLETED.name(), stepExecution.getExitStatus());
