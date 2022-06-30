@@ -13,5 +13,5 @@ Luca Stancapiano's books about:
 ```
 # Dependencies Export
 ```shell
-pache.maven.plugins:maven-dependency-plugin:3.3.0:copy-dependencies -Dmdep.useRepositoryLayout=true -Dmdep.copyPom=true -DoutputDirectory=D:\tmp\mvn_tmp
+mvn org.apache.maven.plugins:maven-dependency-plugin:3.2.0:copy-dependencies -Dmdep.useRepositoryLayout=true -Dmdep.copyPom=true -DoutputDirectory=D:\tmp\mvn_tmp
 ```
