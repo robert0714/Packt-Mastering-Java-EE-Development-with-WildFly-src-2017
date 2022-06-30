@@ -48,7 +48,7 @@ import it.vige.businesscomponents.injection.inject.spi.Taxi;
 import it.vige.businesscomponents.injection.inject.spi.TaxiManager;
 import it.vige.businesscomponents.injection.inject.spi.Toy;
 
-@Ignore
+// @Ignore
 @RunWith(Arquillian.class)
 public class InjectSPITestCase {
 

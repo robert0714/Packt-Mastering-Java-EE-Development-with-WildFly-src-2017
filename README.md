@@ -5,3 +5,9 @@ Luca Stancapiano's books about:
 
 # Other Resources
 * MDB: https://github.com/wildfly/wildfly/blob/main/testsuite/integration/basic/src/test/java/org/jboss/as/test/integration/ejb/mdb/deliveryactive/MDBTestCase.java
+
+
+# Executing
+```shell
+ mvn clean package  -Dmaven.test.failure.ignore=true
+```

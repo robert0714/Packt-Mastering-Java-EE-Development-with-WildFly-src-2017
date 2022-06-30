@@ -242,6 +242,12 @@
 				<artifactId>awaitility-proxy</artifactId>
 				<version>${awaitility-proxy.version}</version>
 				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>net.minidev</groupId>
+				<artifactId>json-smart</artifactId>
+				<version>2.4.8</version>
+				<scope>test</scope>
 			</dependency>  
 		</dependencies>
 	</dependencyManagement>
